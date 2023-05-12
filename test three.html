@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Three.js – Hello cube</title>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+      <style>
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -applesystem, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+            Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+         }
+         html,
+        
+         body {
+            height: 100vh;
+            background-color: gray;
+            overflow: hidden;
+            width: 100vw;
+         }
+         #threejs-container {
+            position: block;
+            width: 50%;
+            height: 50%;
+         }
+         #myElement {
+           position: absolute;
+           top: 10px;
+           left: 980px;
+         }
+         .DynamicElement {
+           position: absolute;
+           top: 470px;
+           left: 10px;
+         }
+         .widthInput{
+            width: 100px;
+         }
+         
+      </style>
+       
+   </head>
+
+   <body>
+      <!-- static table -->
+      <div id="myElement">
+         <div>
+            <div>
+            <table class="table table-dark table-sm " style="width: 130%;" >
+               <thead>
+                  <tr>
+                     <th scope="col" colspan="3" >static Factors</th>
+                  </tr>
+                  <tr>
+                     <th scope="col" >Property</th>
+                     <th scope="col" >Value</th>
+                     <th scope="col" ></th>
+                  </tr>
+               </thead>
+               <tbody>
+               <tr>
+                  <td >mass</td>
+                  <td  ><input type="number" name="" id="mass" value="1000" class="widthInput" ></td>
+                  <td > Kg </td>
+               </tr>
+               <tr>
+                  <td >M Wings Angle </td>
+                  <td ><input type="number" name="" id="M_W_angle" value="30" class="widthInput"  ></td>
+                  <td > rad </td>
+               </tr>
+               <tr>
+                  <td >M Wings Area </td>
+                  <td ><input type="number" name="" id="M_W_area" value="100" class="widthInput" > </td>
+                  <td > m<sup>2</sup></td>
+               </tr>
+               <tr>
+                  <td >R Wing Space  </td>
+                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
+                  <td >kg.m<sup>-2</sup></td>
+               </tr>
+               <tr>
+                  <td >L Wing Space </td>
+                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
+                  <td >kg.m<sup>-2</sup></td>
+               </tr>
+               <tr>
+                  <td >L-R Distance </td>
+                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
+                  <td >m<sup>-2</sup></td>
+               </tr> 
+               <tr>
+                  <td >Temperature </td>
+                  <td > <input type="number" name="" id="A_pressure" value="30"  class="widthInput" ></td>
+                  <td >K</td>
+               </tr>
+               <tr>
+                  <td >ref altitude P </td>
+                  <td > <input type="number" name="" id="A_pressure" value="1" class="widthInput" ></td>
+                  <td >atm</sup></td>
+               </tr>
+               <tr>
+                  <td >Flow Factor </td>
+                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
+                  <td style="color: greenyellow;">Constant</td>
+               </tr>
+
+            </table>
+            </div>
+            <div class="card">
+            <div class="card-body">
+               <button id="start" type="button" class="btn btn-success">start</button>
+               <button id="reset" type="button" class="btn btn-primary">top</button>
+               <button id="pause" type="button" class="btn btn-warning">pause</button>
+               <button id="reset" type="button" class="btn btn-danger">reset</button>
+
+            </div>
+            </div>
+         </div>
+      </div>
+      
+
+      <!-- first buttons tables -->
+      <div class="DynamicElement" style="float: left;">
+         <table class="table table-dark table-sm" style="width: 90%;">
+         <!-- <td scope="col" rowspan="4" style="
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            ">Dynamic Factors</td> -->
+         <thead>
+            <tr>
+               <th scope="col" style="width: 150px;" >Property</th>
+               <th scope="col" style="width: 150px;" >value</th>
+               <th scope="col" >Unit</th>
+            </tr>
+         </thead>
+         <tbody>
+         <tr>
+            <td >Speed</td>
+            <td id="speed" > 0 </td>
+            <td > km/h </td>
+         </tr>
+         <tr>
+            <td >Engine Force</td>
+            <td id="Engineforce"> 0 </td>
+            <td > N </td>
+         </tr>
+         <tr>
+            <td >Air Resistance</td>
+            <td id="AirResistence"> 0 </td>
+            <td > N </td>
+         </tr>
+         <tr>
+            <td >acceleration</td>
+            <td id="acceleration"> 0 </td>
+            <td > m.s<sup>-2</sup> </td>
+         </tr>
+         </table>
+      </div>
+      
+
+      <!--  second dunamic tables  -->
+     <div style="float: left;  position: absolute; top: 470px; left: 335px;">     
+         <table class="table table-dark table-sm " style="width: 90%;">
+            <thead>
+               <tr>
+                  <th scope="col" style="width: 150px;" >Property</th>
+                  <th scope="col" style="width: 150px;" >value</th>
+                  <th scope="col" >Unit</th>
+               </tr>
+            </thead>
+            <tbody>
+            <tr>
+               <td >High</td>
+               <td id="high" > 0 </td>
+               <td > km/h </td>
+            </tr>
+            <tr>
+               <td >Left Wing </td>
+               <td id="Engineforce"> 0 </td>
+               <td > rad </td>
+            </tr>
+            <tr>
+               <td >Right Wing</td>
+               <td id="acceleration"> 0 </td>
+               <td > rad </td>
+            </tr>
+            <tr>
+               <td >Air Resistance</td>
+               <td id="AirResistence"> 0 </td>
+               <td > N </td>
+            </tr>
+         </table>
+     </div>
+
+
+       <!--  third dunamic tables  -->
+       <div style="float: left;  position: absolute; top: 470px; left: 660px;">     
+         <table class="table table-dark table-sm " style="width: 90%;">
+            <thead>
+               <tr>
+                  <th scope="col" style="width: 150px;" >Property</th>
+                  <th scope="col" style="width: 150px;" >value</th>
+                  <th scope="col" >Unit</th>
+               </tr>
+            </thead>
+            <tbody>
+            <tr>
+               <td >Density</td>
+               <td id="high" > 0 </td>
+               <td > kg/m<sup>3</sup> </td>
+            </tr>
+            <tr>
+               <td >Atmospheric P</td>
+               <td id="Engineforce"> 0 </td>
+               <td > atm </td>
+            </tr>
+            <tr>
+               <td >X</td>
+               <td id="acceleration"> 0 </td>
+               <td >x </td>
+            </tr>
+            <tr>
+               <td >X</td>
+               <td id="AirResistence"> 0 </td>
+               <td >x</td>
+            </tr>
+         </table>
+     </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script> 
+     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/OBJLoader.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/MTLLoader.js"></script>
+     <script src="https://unpkg.com/cannon/build/cannon.min.js"></script>
+    
+  
+      <div id="threejs-container"></div>
+      <script src="script.js">
+      </script>
+
+   </body>
+</html>
+
+
