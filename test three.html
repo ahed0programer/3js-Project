@@ -81,25 +81,25 @@
                <tr>
                   <td >R Wing Space  </td>
                   <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
-                  <td >kg.m<sup>-2</sup></td>
+                  <td >m<sup>2</sup></td>
                </tr>
                <tr>
                   <td >L Wing Space </td>
                   <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
-                  <td >kg.m<sup>-2</sup></td>
+                  <td >m<sup>2</sup></td>
                </tr>
                <tr>
                   <td >L-R Distance </td>
                   <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
-                  <td >m<sup>-2</sup></td>
+                  <td >m</td>
                </tr> 
                <tr>
-                  <td >Temperature </td>
-                  <td > <input type="number" name="" id="A_pressure" value="30"  class="widthInput" ></td>
+                  <td >Ref Temperature </td>
+                  <td > <input type="number" name="" id="A_pressure" value="27"  class="widthInput" ></td>
                   <td >K</td>
                </tr>
                <tr>
-                  <td >ref altitude P </td>
+                  <td >Ref Altitude P </td>
                   <td > <input type="number" name="" id="A_pressure" value="1" class="widthInput" ></td>
                   <td >atm</sup></td>
                </tr>
@@ -124,7 +124,7 @@
       </div>
       
 
-      <!-- first buttons tables -->
+      <!-- First Dynamic tables -->
       <div class="DynamicElement" style="float: left;">
          <table class="table table-dark table-sm" style="width: 90%;">
          <!-- <td scope="col" rowspan="4" style="
@@ -163,7 +163,7 @@
       </div>
       
 
-      <!--  second dunamic tables  -->
+      <!--  Second Dynamic tables  -->
      <div style="float: left;  position: absolute; top: 470px; left: 335px;">     
          <table class="table table-dark table-sm " style="width: 90%;">
             <thead>
@@ -177,17 +177,17 @@
             <tr>
                <td >High</td>
                <td id="high" > 0 </td>
-               <td > km/h </td>
+               <td > m </td>
             </tr>
             <tr>
                <td >Left Wing </td>
-               <td id="Engineforce"> 0 </td>
-               <td > rad </td>
+               <td id="L_wing"> 0 </td>
+               <td > deg </td>
             </tr>
             <tr>
                <td >Right Wing</td>
-               <td id="acceleration"> 0 </td>
-               <td > rad </td>
+               <td id="R_wing"> 0 </td>
+               <td > deg </td>
             </tr>
             <tr>
                <td >Air Resistance</td>
@@ -198,7 +198,7 @@
      </div>
 
 
-       <!--  third dunamic tables  -->
+       <!--  Third Dynamic tables  -->
        <div style="float: left;  position: absolute; top: 470px; left: 660px;">     
          <table class="table table-dark table-sm " style="width: 90%;">
             <thead>
@@ -220,9 +220,9 @@
                <td > atm </td>
             </tr>
             <tr>
-               <td >X</td>
+               <td >Plane Horizon</td>
                <td id="acceleration"> 0 </td>
-               <td >x </td>
+               <td >deg </td>
             </tr>
             <tr>
                <td >X</td>

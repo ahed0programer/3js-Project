@@ -42,7 +42,7 @@
          
          
          //plane 
-         const planegeometry = new THREE.PlaneGeometry( 2000, 2000 ,30,30);
+         const planegeometry = new THREE.PlaneGeometry( 10000, 2000 ,30,30);
          const planematerial = new THREE.MeshBasicMaterial( {color: 0x8f8f8f, side: THREE.DoubleSide , wireframe :true  } );
          const plane = new THREE.Mesh( planegeometry, planematerial );
          plane.rotation.x=0.5*3.14
@@ -63,7 +63,7 @@
          const A_pressureElement = document.getElementById("A_pressure");
 
          const mass = massElement.value
-         const M_W_angle = M_W_angleElement.value
+         const M_W_angle = (M_W_angleElement.value * Math.PI)/180
          const M_W_area = M_W_areaElement.value
          const A_pressure = A_pressureElement.value
          console.log(mass)
@@ -104,7 +104,7 @@
 
          // Create a Cannon.js world and set gravity
          const world = new CANNON.World();
-         world.gravity.set(0, -9.82, 0);
+         world.gravity.set(0, -9.81, 0);
 
          // create ground
          const groundShape = new CANNON.Plane();
@@ -114,7 +114,7 @@
          world.addBody(groundBody);
          
          // Create a box shape for collision detection
-         const modelShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+         const modelShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
          // Create a body for the 3D model and add it to the world
          const body = new CANNON.Body({
            mass: parseInt(mass),
@@ -129,13 +129,23 @@
        const myElement = document.getElementById("force");
        const EngineForceElement = document.getElementById("Engineforce");
        const AirResistenceElemnt = document.getElementById("AirResistence");
+       const M_W_AngleElemnt = document.getElementById("M_W_angle");
        const accelerationElemnt = document.getElementById("acceleration");
+       const L_wing_AElemnt = document.getElementById("L_wing");
+       const R_wing_AElemnt = document.getElementById("R_wing");
+       const highElemnt = document.getElementById("high");
        
-
        const R=8.31447 ; const M =0.0289644 ;
+
+
 
        const engineForce   = new CANNON.Vec3(0,0,0);
        const AirResistence = new CANNON.Vec3(0,0,0);
+       const FloatingForce = new CANNON.Vec3(0,0,0);
+
+       var L_wing_Angle =0 ;
+       var R_wing_Angle =0 ;
+       var high=body.position.y;
 
       
        
@@ -146,38 +156,73 @@
          let rotationSpeed = 0.01;
          // Add event listener for keydown events
          document.addEventListener('keydown', function (event) {
-           switch (event.keyCode) {
+           switch (event.key) {
 
-             case 37: // left arrow
+             case "ArrowLeft": // left arrow
                // Rotate model around Y axis in clockwise direction
                OBJmodel.rotation.y += rotationSpeed;
                
                break;
 
-             case 38: // up arrow
+             case "ArrowUp": // up arrow
                // Move model along positive Z axis
                // body.position.x += Math.sin(OBJmodel.rotation.y);
                // body.position.z += Math.cos(OBJmodel.rotation.y);;
                // world.gravity.y +=0.3;
-               engineForce.x+=100;
+               engineForce.x+=50;
                EngineForceElement.innerHTML = engineForce.x ;
                accelerationElemnt.innerHTML = engineForce.x/body.mass ;
                break;
 
-             case 39: // right arrow
+             case "ArrowRight": // right arrow
                // Rotate model around Y axis in counter-clockwise direction
                OBJmodel.rotation.y -= rotationSpeed;
-               
                break;
 
-             case 40: // down arrow
+             case "ArrowDown": // down arrow
                // Move model along negative Z axis
                //body.position.x -= 5;
                //world.gravity.y -= 0.3;
-               engineForce.x-=100;
+               engineForce.x-=50;
                EngineForceElement.innerHTML = engineForce.x ;
                accelerationElemnt.innerHTML = engineForce.x/body.mass ;
                break;
+
+              case "1": 
+                // decrease the left wing angle
+                L_wing_Angle-=0.025;
+                R_wing_Angle-=0.025;
+                L_wing_AElemnt.innerHTML =parseInt((180*L_wing_Angle)/Math.PI);
+                R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI) ;
+                console.log("dsssss")
+                break;
+
+              case "7": 
+                // decrease the left wing angle
+                L_wing_Angle+=0.025;
+                R_wing_Angle+=0.025;
+                L_wing_AElemnt.innerHTML =parseInt((180*L_wing_Angle)/Math.PI) ;
+                R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI) ;
+                console.log("dsssss")
+                break;
+
+              case "9": 
+                // decrease the left wing angle
+                L_wing_Angle-=0.025;
+                R_wing_Angle+=0.025;
+                R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI);
+                L_wing_AElemnt.innerHTML =parseInt((180*L_wing_Angle)/Math.PI);
+                console.log("dsssss")
+                break;
+
+              case "3": 
+                // decrease the left wing angle
+                L_wing_Angle+=0.025;
+                R_wing_Angle-=0.025;
+                R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI);
+                L_wing_AElemnt.innerHTML =parseInt((180*L_wing_Angle)/Math.PI);
+                console.log("dsssss")
+                break;
            }
 
          });
@@ -199,20 +244,29 @@
          })
 
          function applyChanges(){
-            AirResistence.x=0;
-         }
+            var v2=Math.floor(0.5+(3600*body.velocity.x/1000))
+            AirResistence.x=-0.5*v2*v2*Math.sin(M_W_angle);
+            FloatingForce.y = -AirResistence.x*Math.cos(M_W_angle)
 
+            highElemnt.innerHTML =parseInt(body.position.y);
+            speedElement.innerHTML =Math.floor(0.5+(3600*body.velocity.length()/1000))
+            AirResistenceElemnt.innerHTML=Math.floor(0.5+(3600*body.velocity.x/1000));
+
+         }
 
          // rendering the scene
    
          function animate() {
             if(status)
             requestAnimationFrame(animate)
-          
-            speedElement.innerHTML =Math.floor(0.5+(3600*body.velocity.x/1000 ))
+
+            applyChanges()
+         
             world.step(1 / 60); // Step the simulation at 60fps
 
             body.applyForce(engineForce , body.position);
+            body.applyForce(AirResistence , body.position);
+            body.applyForce(FloatingForce , body.position);
 
             OBJmodel.position.copy(body.position)
             //OBJmodel.quaternion.set(body.quaternion.x, body.quaternion.y, body.quaternion.z, body.quaternion.w);
