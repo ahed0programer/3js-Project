@@ -65,7 +65,7 @@
                <tbody>
                <tr>
                   <td >mass</td>
-                  <td  ><input type="number" name="" id="mass" value="1000" class="widthInput" ></td>
+                  <td  ><input type="number" name="" id="mass" value="5000" class="widthInput" ></td>
                   <td > Kg </td>
                </tr>
                <tr>
@@ -75,17 +75,12 @@
                </tr>
                <tr>
                   <td >M Wings Area </td>
-                  <td ><input type="number" name="" id="M_W_area" value="100" class="widthInput" > </td>
+                  <td ><input type="number" name="" id="M_W_area" value="12" class="widthInput" > </td>
                   <td > m<sup>2</sup></td>
                </tr>
                <tr>
-                  <td >R Wing Space  </td>
-                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
-                  <td >m<sup>2</sup></td>
-               </tr>
-               <tr>
-                  <td >L Wing Space </td>
-                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
+                  <td >L-R Wing Space  </td>
+                  <td > <input type="number" name="" id="A_pressure" value="1" class="widthInput" ></td>
                   <td >m<sup>2</sup></td>
                </tr>
                <tr>
@@ -95,17 +90,17 @@
                </tr> 
                <tr>
                   <td >Ref Temperature </td>
-                  <td > <input type="number" name="" id="A_pressure" value="27"  class="widthInput" ></td>
+                  <td > <input type="number" name="" id="Tempareture" value="300"  class="widthInput" ></td>
                   <td >K</td>
                </tr>
                <tr>
                   <td >Ref Altitude P </td>
-                  <td > <input type="number" name="" id="A_pressure" value="1" class="widthInput" ></td>
+                  <td > <input type="number" name="" id="R_A_pressure" value="1" class="widthInput" ></td>
                   <td >atm</sup></td>
                </tr>
                <tr>
                   <td >Flow Factor </td>
-                  <td > <input type="number" name="" id="A_pressure" value="30" class="widthInput" ></td>
+                  <td > <input type="number" name="" id="A_pressure" value="1" class="widthInput" ></td>
                   <td style="color: greenyellow;">Constant</td>
                </tr>
 
@@ -216,17 +211,17 @@
             </tr>
             <tr>
                <td >Atmospheric P</td>
-               <td id="Engineforce"> 0 </td>
-               <td > atm </td>
+               <td id="pressure"> 0 </td>
+               <td > psi </td>
             </tr>
             <tr>
                <td >Plane Horizon</td>
-               <td id="acceleration"> 0 </td>
+               <td id="P_horizon"> 0 </td>
                <td >deg </td>
             </tr>
             <tr>
-               <td >X</td>
-               <td id="AirResistence"> 0 </td>
+               <td >Pressure Diff</td>
+               <td id="pressure_diff"> 0 </td>
                <td >x</td>
             </tr>
          </table>
@@ -240,7 +235,11 @@
     
   
       <div id="threejs-container"></div>
-      <script src="script.js">
+      
+      <script src="danger sound.js">
+      </script>
+
+      <script src="script.js?v=15">
       </script>
 
    </body>
