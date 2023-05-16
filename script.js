@@ -184,7 +184,8 @@
        var enginepower=0
        var pressure_D=0;
        var modelrotation=0;
-
+       var xz_engine=0;
+       var xz_floating=0;
       
        
        // Change the content
@@ -294,30 +295,35 @@
            
             //var vy=Math.floor(0.5+(3600*body.velocity.y/1000))
 
-            engineForce.x = enginepower*Math.cos(modelrotation);
-            engineForce.z = enginepower*Math.sin(modelrotation)
+            engineForce.x = enginepower*Math.cos(OBJmodel.rotation.y);
+            engineForce.z = enginepower*Math.sin(OBJmodel.rotation.y)
 
-            AirResistence.x=-(0.5*body.velocity.x*body.velocity.x*wings_area*Math.sin(M_W_angle)*(Math.cos(modelrotation)));
-            AirResistence.z=-(0.5*body.velocity.z*body.velocity.z*wings_area*Math.sin(M_W_angle)*(Math.sin(modelrotation)));
+            AirResistence.x=-(0.5*body.velocity.x*body.velocity.x*wings_area*Math.sin(M_W_angle)*(Math.cos(OBJmodel.rotation.y)));
+            AirResistence.z=-(0.5*body.velocity.z*body.velocity.z*wings_area*Math.sin(M_W_angle)*(Math.sin(OBJmodel.rotation.y)));
             AirResistence.y=0;//-0.5*vy*vy;
 
             airResist = Math.sqrt(AirResistence.x*AirResistence.x + AirResistence.z*AirResistence.z)
 
+       
+
             FloatingForce.y = airResist*Math.cos(M_W_angle)*Math.cos(plane_horizon);
             //////
-            FloatingForce.x = airResist*Math.cos(M_W_angle)*Math.cos(modelrotation)*Math.sin(plane_horizon);
-            FloatingForce.z = airResist*Math.cos(M_W_angle)*Math.sin(modelrotation)*Math.sin(plane_horizon);
+            FloatingForce.x = airResist*Math.cos(M_W_angle)*Math.cos(OBJmodel.rotation.y)*Math.sin(plane_horizon);
+            FloatingForce.z = airResist*Math.cos(M_W_angle)*Math.sin(OBJmodel.rotation.y)*Math.sin(plane_horizon);
 
-            xz_engine = Math.sqrt(engineForce.x*engineForce.x + engineForce.z+ engineForce.z)
-            xz_floating = Math.sqrt(FloatingForce.x*FloatingForce.x + FloatingForce.z+ FloatingForce.z)
+            xz_engine = Math.sqrt(engineForce.x*engineForce.x + engineForce.z*engineForce.z)
+            xz_floating = Math.sqrt(FloatingForce.x*FloatingForce.x + FloatingForce.z*FloatingForce.z)
 
+            
+            OBJmodel.rotation.x=plane_horizon
+            if(xz_engine!=0)
             modelrotation = Math.atan(xz_floating/xz_engine)
-            console.log(Math.atan(0))
+            OBJmodel.rotation.y =modelrotation
+            
+            //console.log(Math.atan(0))
             /////
           
-            OBJmodel.rotation.x=plane_horizon
-            OBJmodel.rotation.y=-modelrotation
-            
+         
 
             pressure = Atm_P * Math.exp(-g*M*Math.floor(body.position.y)/(R*temp))
             pressure_D =P0 - pressure; 
