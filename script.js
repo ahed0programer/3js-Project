@@ -155,7 +155,7 @@
        const AirResistenceElemnt = document.getElementById("AirResistence");
        const M_W_AngleElemnt = document.getElementById("M_W_angle");
        const M_W_areaElemnt = document.getElementById("M_W_area");
-       const accelerationElemnt = document.getElementById("acceleration");
+       const floating_forceElemnt = document.getElementById("floating_force");
        const L_wing_AElemnt = document.getElementById("L_wing");
        const R_wing_AElemnt = document.getElementById("R_wing");
        const highElemnt = document.getElementById("high");
@@ -164,8 +164,10 @@
        const pressureElement =document.getElementById("pressure");
        const pressure_DElemnt = document.getElementById("pressure_diff");
        const P_horizonElement =  document.getElementById("P_horizon");
+       const densityElement =  document.getElementById("density");
        
-       const g=9.81 ;const R=8.31447 ; const M =0.0289644 ;const temp=TemparetureElemnt.value ; const P0 = 14.6959*R_pressureElemnt.value ;
+       const g=9.81 ;const R=8.31447 ; const M =0.0289644 ;
+       const temp=TemparetureElemnt.value ; const P0 = 14.6959*R_pressureElemnt.value ;
        const wings_area =2*M_W_areaElemnt.value
 
 
@@ -180,7 +182,7 @@
        var R_wing_Angle =0 ;
        var plane_horizon=0 ;
        var high=body.position.y;
-       var Atm_P=P0;
+       var density=P0*M/(R*temp);
        var enginepower=0
        var pressure_D=0;
        var modelrotation=0;
@@ -210,7 +212,6 @@
                // world.gravity.y +=0.3;
                enginepower +=50;
                EngineForceElement.innerHTML = enginepower ;
-               accelerationElemnt.innerHTML = enginepower/body.mass ;
                
                break;
 
@@ -225,7 +226,6 @@
                //world.gravity.y -= 0.3;
                enginepower-=50;
                EngineForceElement.innerHTML = enginepower ;
-               accelerationElemnt.innerHTML = enginepower/body.mass ;
                break;
 
               case "1": 
@@ -290,7 +290,14 @@
             status=false
          })
 
-        
+         var x1 =body.position.x;
+         var z1 =body.position.z;
+         var x2 =body.position.x;
+         var z2 =body.position.z;
+         var m1 =0;
+         var m2 =0;
+         var t1=0;
+         var t2=0;
          function applyChanges(){
            
             //var vy=Math.floor(0.5+(3600*body.velocity.y/1000))
@@ -298,8 +305,8 @@
             engineForce.x = enginepower*Math.cos(OBJmodel.rotation.y);
             engineForce.z = enginepower*Math.sin(OBJmodel.rotation.y)
 
-            AirResistence.x=-(0.5*body.velocity.x*body.velocity.x*wings_area*Math.sin(M_W_angle)*(Math.cos(OBJmodel.rotation.y)));
-            AirResistence.z=-(0.5*body.velocity.z*body.velocity.z*wings_area*Math.sin(M_W_angle)*(Math.sin(OBJmodel.rotation.y)));
+            AirResistence.x=-(0.5*body.velocity.x*density*body.velocity.x*wings_area*Math.sin(M_W_angle)*(Math.cos(OBJmodel.rotation.y)));
+            AirResistence.z=-(0.5*body.velocity.z*density*body.velocity.z*wings_area*Math.sin(M_W_angle)*(Math.sin(OBJmodel.rotation.y)));
             AirResistence.y=0;//-0.5*vy*vy;
 
             airResist = Math.sqrt(AirResistence.x*AirResistence.x + AirResistence.z*AirResistence.z)
@@ -308,25 +315,53 @@
 
             FloatingForce.y = airResist*Math.cos(M_W_angle)*Math.cos(plane_horizon);
             //////
-            FloatingForce.x = airResist*Math.cos(M_W_angle)*Math.cos(OBJmodel.rotation.y)*Math.sin(plane_horizon);
-            FloatingForce.z = airResist*Math.cos(M_W_angle)*Math.sin(OBJmodel.rotation.y)*Math.sin(plane_horizon);
+            FloatingForce.x = airResist*Math.cos(M_W_angle)*Math.sin(OBJmodel.rotation.y)*Math.sin(plane_horizon);
+            FloatingForce.z = airResist*Math.cos(M_W_angle)*Math.cos(OBJmodel.rotation.y)*Math.sin(plane_horizon);
 
             xz_engine = Math.sqrt(engineForce.x*engineForce.x + engineForce.z*engineForce.z)
             xz_floating = Math.sqrt(FloatingForce.x*FloatingForce.x + FloatingForce.z*FloatingForce.z)
 
             
             OBJmodel.rotation.x=plane_horizon
-            if(xz_engine!=0)
-            modelrotation = Math.atan(xz_floating/xz_engine)
-            OBJmodel.rotation.y =modelrotation
+            if(xz_floating!=0){
+              t1+=1/60;
+            }
+            if(t1>1){
+              if(body.position.x-x2!=0)
+              m1=((body.position.z-z2)/(body.position.x-x2));
+              if(x2-x1!=0)
+              m2=((z2-z1)/(x2-x1))
+              if(m2!=0)
+              modelrotation +=(Math.atan(m2/m1))
+            console.log(modelrotation)
+            console.log(OBJmodel.rotation.y + " ssss")
+            OBJmodel.rotation.y = -modelrotation
             
+            x1=x2
+            z1=z2
+            x2=body.position.x;
+            z2=body.position.z;
+            t1=0;
+            }
+          
+
+
+
+            body.applyForce(engineForce , body.position);
+            body.applyForce(AirResistence , body.position);
+            body.applyForce(FloatingForce , body.position);
+
+            
+
             //console.log(Math.atan(0))
             /////
           
          
 
-            pressure = Atm_P * Math.exp(-g*M*Math.floor(body.position.y)/(R*temp))
-            pressure_D =P0 - pressure; 
+            pressure   = P0*Math.exp(-g*M*Math.floor(body.position.y)/(R*temp))
+            pressure_D = P0 - pressure; 
+
+            density=6894.757*pressure*M/(R*temp);
 
             //const distance = /* calculate distance to dangerous object */;
             if (pressure_D > dangerThreshold) {
@@ -341,9 +376,11 @@
          var colored =true
          function displayData(){
             pressureElement.innerHTML =pressure;
+            densityElement.innerHTML =density
             highElemnt.innerHTML =parseInt(body.position.y);
             speedElement.innerHTML =Math.floor(0.5+(3600*body.velocity.length()/1000));
             AirResistenceElemnt.innerHTML=parseInt(AirResistence.length());
+            floating_forceElemnt.innerHTML=FloatingForce.y;
             P_horizonElement.innerHTML = plane_horizon;
             if(pressure_D >= 8 && colored){
               pressure_DElemnt.style.color='red'
@@ -372,10 +409,7 @@
          
             world.step(1 / 40); // Step the simulation at 60fps
 
-            body.applyForce(engineForce , body.position);
-            body.applyForce(AirResistence , body.position);
-            body.applyForce(FloatingForce , body.position);
-
+           
             OBJmodel.position.copy(body.position)
             //body.quaternion.y=;
             
