@@ -72,6 +72,11 @@
                   <td ><input type="number" name="" id="body_AreaElemnt" value="4" class="widthInput" ></td>
                   <td > m<sup>2</sup></td>
                </tr>
+               <tr>
+                  <td >Bottom Area </td>
+                  <td ><input type="number" name="" id="plane_bottom_area" value="12" class="widthInput" ></td>
+                  <td > m<sup>2</sup></td>
+               </tr>
                
                <tr>
                   <td >M Wings Angle </td>
@@ -94,6 +99,16 @@
                   <td >m</td>
                </tr> 
                <tr>
+                  <td >Rare W Area  </td>
+                  <td > <input type="number" name="" id="Rare_W_area" value="1" class="widthInput" ></td>
+                  <td >m<sup>2</sup></td>
+               </tr>
+               <tr>
+                  <td >Rare W Dist </td>
+                  <td ><input type="number" name="" id="Rare_W_Distance" value="10" class="widthInput" ></td>
+                  <td >m</td>
+               </tr> 
+               <tr>
                   <td >Ref Temperature </td>
                   <td > <input type="number" name="" id="Tempareture" value="300"  class="widthInput" ></td>
                   <td >K</td>
@@ -104,8 +119,8 @@
                   <td >atm</sup></td>
                </tr>
                <tr>
-                  <td >Flow Factor </td>
-                  <td > <input type="number" name="" id="A_pressure" value="1" class="widthInput" ></td>
+                  <td >Flow Factor CDn</td>
+                  <td > <input type="number" name="" id="CDn" value="1" class="widthInput" ></td>
                   <td style="color: greenyellow;">Constant</td>
                </tr>
 
@@ -164,7 +179,7 @@
       
 
       <!--  Second Dynamic tables  -->
-     <div style="float: left;  position: absolute; top: 470px; left: 335px;">     
+     <div style="float: left;  position: absolute; top: 470px; left: 330px;">     
          <table class="table table-dark table-sm " style="width: 90%;">
             <thead>
                <tr>
@@ -190,16 +205,16 @@
                <td > deg </td>
             </tr>
             <tr>
-               <td >Air Resistance</td>
-               <td id="AirResistence"> 0 </td>
-               <td > N </td>
+               <td >Rare W-Angle</td>
+               <td id="rare_w_angle"> 0 </td>
+               <td > deg </td>
             </tr>
          </table>
      </div>
 
 
        <!--  Third Dynamic tables  -->
-       <div style="float: left;  position: absolute; top: 470px; left: 660px;">     
+       <div style="float: left;  position: absolute; top: 470px; left: 650px;">     
          <table class="table table-dark table-sm " style="width: 90%;">
             <thead>
                <tr>
@@ -240,13 +255,13 @@
   
       <div id="threejs-container"></div>
       
-      <script src="Phisics.js?v=4">
+      <script src="Phisics.js?v=8">
       </script>
 
       <script src="scene env.js">
       </script>
 
-      <script src="script.js?v=55">
+      <script src="script.js?v=47">
       </script>
 
    </body>
