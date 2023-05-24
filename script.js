@@ -158,7 +158,6 @@ pauseElement.addEventListener('click',function(){
   status=false
 })
 
-  
 function applyChanges(){
   
   //let v  = phisicalbody.velocity.length();
