@@ -20,8 +20,8 @@ light.shadow.camera.bottom = -50
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(width/1.4, height/1.47)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.shadowMapEnabled = true
-renderer.shadowMapType = THREE.PCFSoftShadowMap
+// renderer.shadowMapEnabled = true
+// renderer.shadowMapType = THREE.PCFSoftShadowMap
 
 
 
@@ -104,6 +104,92 @@ mtlLoader.load('Airplane_v1_L1/11803_Airplane_v1_l1.mtl', (materials) => {
 
 controls.target = OBJmodel.position 
 scene.add(OBJmodel)
+
+const Mountmodel = new THREE.Object3D();
+
+mtlLoader.load('mountain/mount.blend1.mtl', (materials) => {
+   materials.preload()
+   // loading geometry
+
+   objLoader.setMaterials(materials)
+   objLoader.load('mountain/mount.blend1.obj', function (object) {
+
+      object.scale.x=150;
+      object.scale.y=250;
+      object.scale.z=150;
+      object.position.x=2000;
+      //object.rotation.x=-0.5*3.14
+      //object.castShadow = true
+      //object.recieveShadow = true
+      // obj=object
+      //
+      Mountmodel.add(object);
+      // scene.add(object)
+
+   })
+   scene.add(Mountmodel)
+})
+
+const roadmodel = new THREE.Object3D();
+obj2Loader = new THREE.OBJLoader()
+mtl2Loader = new THREE.MTLLoader()
+
+mtl2Loader.load('road2/untitled.mtl', (materials) => {
+   materials.preload()
+   // loading geometry
+
+   obj2Loader.setMaterials(materials)
+   obj2Loader.load('road2/untitled.obj', function (object) {
+
+      object.scale.x=150;
+      object.scale.z=50;
+      object.position.x=0;
+      //object.rotation.x=-0.5*3.14
+      //object.castShadow = true
+      //object.recieveShadow = true
+      // obj=object
+      //
+      roadmodel.add(object);
+      // scene.add(object)
+
+   })
+   scene.add(roadmodel)
+})
+
+//.....
+// boxes :
+const boxgeometry = new THREE.BoxGeometry(50,50,50);
+const boxmaterial = new THREE.MeshBasicMaterial( {color: 0xff0000 } );
+const box1 = new THREE.Mesh( boxgeometry, boxmaterial );
+box1.position.y= 100
+box1.position.x= Mountmodel.position.x +1400
+box1.position.z= Mountmodel.position.z -700
+box1.recieveShadow = true
+scene.add( box1 );
+
+const box2 = new THREE.Mesh( boxgeometry, boxmaterial );
+box2.position.y= 100
+box2.position.x= Mountmodel.position.x +1400
+box2.position.z= Mountmodel.position.z +700
+box2.recieveShadow = true
+scene.add( box2 );
+
+const box3 = new THREE.Mesh( boxgeometry, boxmaterial );
+box3.position.y= 100
+box3.position.x= Mountmodel.position.x +2500
+box3.position.z= Mountmodel.position.z -700
+box3.recieveShadow = true
+scene.add( box3 );
+
+const box4 = new THREE.Mesh( boxgeometry, boxmaterial );
+box4.position.y= 100
+box4.position.x= Mountmodel.position.x +2500
+box4.position.z= Mountmodel.position.z +700
+box4.recieveShadow = true
+scene.add( box4 );
+
+
+
 
 const container = document.querySelector('#threejs-container')
 container.append(renderer.domElement)

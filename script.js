@@ -12,7 +12,13 @@ const R_pressureElemnt =document.getElementById("R_A_pressure");
 const TemparetureElemnt =document.getElementById("Tempareture");
 const plane_bottom_areaElemnt = document.getElementById("plane_bottom_area");
 const CDnElement =  document.getElementById("CDn");
+const air_vElement =  document.getElementById("air_v");
 
+// elements on the display port
+
+const xElement =document.getElementById("x");
+const yElement =document.getElementById("y");
+const zElement =document.getElementById("z");
 
 // Get a reference to the Dynamic Factors
 const myElement = document.getElementById("force");
@@ -43,6 +49,7 @@ const M_W_angle = (M_W_angleElement.value * Math.PI)/180;
 const plane_bottom_area =plane_bottom_areaElemnt.value;
 const Rare_W_area = Rare_W_areaElemnt.value;
 const Rare_W_Distance = Rare_W_DistanceElemnt.value;
+const air_v = (air_vElement.value*1000)/3600;
 
 // here they are the forces victors used in Ahed's phisics class 
 // those are used to apply forces on the phisics object body (from civil plane's expeirance)
@@ -52,6 +59,7 @@ const engineForce   = new THREE.Vector3(1,0,0);
 const AirResistence = new THREE.Vector3(-1,0,0);
 const Y_AirResistence = new THREE.Vector3(0,-1,0);
 const FloatingForce = new THREE.Vector3(0,1,0);
+const airfoilForce = new THREE.Vector3(0,1,0);
 
 // 
 var L_wing_Angle =0 ;
@@ -64,7 +72,7 @@ var pressure_D=0;
 //  var modelrotation=0;
 
 
-const phisicalbody = new PhisicalOBJ(mass , new THREE.Vector3(0,0,0) )
+const phisicalbody = new PhisicalOBJ(mass , new THREE.Vector3(-2000,0,0) )
 //phisicalbody.quaternion = OBJmodel.quaternion;
 let rotationSpeed = Math.PI/40;
 // Add event listener for keydown events
@@ -95,9 +103,9 @@ document.addEventListener('keydown', function (event) {
       EngineForceElement.innerHTML = enginepower ;
       break;
 
-    case "1": 
+    case "2": 
       // decrease the left and right wings angle
-      if(L_wing_Angle > -Math.PI/4 || R_wing_Angle > -Math.PI/4){
+      if((L_wing_Angle > -Math.PI/4 || R_wing_Angle > -Math.PI/4) && L_wing_Angle==R_wing_Angle){
         L_wing_Angle-=Math.PI/40;
         R_wing_Angle-=Math.PI/40;
       }
@@ -106,9 +114,9 @@ document.addEventListener('keydown', function (event) {
       console.log("dsssss")
       break;
 
-    case "7": 
+    case "8": 
       // increase the left and right wings angle
-      if(L_wing_Angle < Math.PI/4 || R_wing_Angle < Math.PI/4){
+      if((L_wing_Angle < Math.PI/4 || R_wing_Angle < Math.PI/4 ) && L_wing_Angle==R_wing_Angle){
       L_wing_Angle+=Math.PI/40;
       R_wing_Angle+=Math.PI/40;
       }
@@ -116,21 +124,27 @@ document.addEventListener('keydown', function (event) {
       R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI) ;
       break;
 
-    case "9": 
-      // decrease the left wing angle and increase the right one
+    case "4": 
+      // decrease the left wing angle and increase the right 
+      // changes the plane's path to the left  
+      if(L_wing_Angle > -Math.PI/4 || R_wing_Angle < Math.PI/4){
       L_wing_Angle-=Math.PI/40;
       R_wing_Angle+=Math.PI/40;
-      R_wing_AElemnt.innerHTML =Math.floor((180*R_wing_Angle)/Math.PI);
-      L_wing_AElemnt.innerHTML =Math.floor((180*L_wing_Angle)/Math.PI);
+      R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI);
+      L_wing_AElemnt.innerHTML =parseInt((180*L_wing_Angle)/Math.PI);
       break;
+      }
 
-    case "3": 
+    case "6": 
       // increase the left wing angle and decrease the right one
+      // changes the plane's path to the right  
+      if(L_wing_Angle < Math.PI/4 || R_wing_Angle > -Math.PI/4){
       L_wing_Angle+=Math.PI/40;
       R_wing_Angle-=Math.PI/40;
-      R_wing_AElemnt.innerHTML =Math.floor((180*R_wing_Angle)/Math.PI);
-      L_wing_AElemnt.innerHTML =Math.floor((180*L_wing_Angle)/Math.PI);
+      R_wing_AElemnt.innerHTML =parseInt((180*R_wing_Angle)/Math.PI);
+      L_wing_AElemnt.innerHTML =parseInt((180*L_wing_Angle)/Math.PI);
       break;
+      }
   }
 
 });
@@ -158,6 +172,7 @@ pauseElement.addEventListener('click',function(){
   status=false
 })
 
+time = 0
 function applyChanges(){
   
   //let v  = phisicalbody.velocity.length();
@@ -167,6 +182,11 @@ function applyChanges(){
   airResist =0.5*vxz*vxz*density*wings_area*Math.sin(M_W_angle)*CDn;
   floatingF =airResist*Math.cos(M_W_angle);
   Y_airResist =0.5*vy*vy*density*(wings_area*Math.cos(M_W_angle)+plane_bottom_area);
+  airfoil = 0.2*air_v*air_v*density*(wings_area+plane_bottom_area)*(Math.random()*Math.sin(time));
+  console.log(air_v)
+  time+=(1/120)
+  if(time>=Math.PI)
+  time = 0;
 
   // those are path control Unit 
   // those are the wings that controls the plane path and two-side wings and rare wing
@@ -187,6 +207,7 @@ function applyChanges(){
   phisicalbody.applyForce(new THREE.Vector3(0,RW_Resist,0),new THREE.Vector3(0,0,LR_Distance/2));
   phisicalbody.applyForce(new THREE.Vector3(0,LW_Resist,0),new THREE.Vector3(0,0,-LR_Distance/2));
   phisicalbody.applyForce(new THREE.Vector3(0,0,Rare_Resist),new THREE.Vector3(Rare_W_Distance,0,0));
+  phisicalbody.applyForce(new THREE.Vector3(0,airfoil,0),undefined, new THREE.Vector4(Mountmodel.position.x+2000 ,Mountmodel.position.y , Mountmodel.position.z,500));
 
   if(phisicalbody.position.y>0.2)
     phisicalbody.applyForce(gravity);
@@ -232,6 +253,11 @@ function displayData(){
     hazard.play();
   }
   pressure_DElemnt.innerHTML=pressure_D
+
+  // data on the display port 
+  xElement.innerHTML = "x : "+ parseInt(phisicalbody.position.x)
+  yElement.innerHTML = "y : "+ parseInt(phisicalbody.position.y)
+  zElement.innerHTML = "z : "+ parseInt(phisicalbody.position.z)
 }
 
 function planeSound(){

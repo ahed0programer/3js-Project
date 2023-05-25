@@ -1,29 +1,4 @@
 
-// class PhisicalOBJ  {
-//   constructor(mass, position, velocity) {
-//     this.mass = mass;
-//     this.position = position || new THREE.Vector3();
-//     this.velocity = velocity || new THREE.Vector3();
-//     this.acceleration = new THREE.Vector3();
-//   }
-
-//   applyForce(force) {
-//     const f = force.clone().divideScalar(this.mass);
-//     this.acceleration.add(f);
-//   }
-
-//   update(dt) {
-//     // Update velocity based on acceleration
-//     this.velocity.add(this.acceleration.clone().multiplyScalar(dt));
-
-//     // Update position based on velocity
-//     this.position.add(this.velocity.clone().multiplyScalar(dt));
-
-//     // Clear acceleration for next frame
-//     this.acceleration.set(0, 0, 0);
-//   }
-// }
-
 class PhisicalOBJ {
   constructor(mass, position, velocity) {
     this.mass = mass;
@@ -35,10 +10,28 @@ class PhisicalOBJ {
     this.angularAcceleration = new THREE.Vector3(); // add angular acceleration property
   }
 
-  applyForce(force, relativePosition  ) {
-    const f = force.clone().divideScalar(this.mass);
-    this.acceleration.add(f);
+  check_IN_theposition(inPosition){
+    let checkx=false;
+    let checkz=false;
+    let checky=false;
+    if((this.position.x <inPosition.x+inPosition.w && this.position.x >inPosition.x-inPosition.w)||inPosition.x==0)
+      checkx=true;
+    if((this.position.z <inPosition.z+inPosition.w && this.position.z >inPosition.z-inPosition.w)||inPosition.z==0)
+      checkz=true;
+    if((this.position.y <inPosition.y+inPosition.w && this.position.y <inPosition.y-inPosition.w)||inPosition.y==0)
+      checky=true;
+    
+    return (checkx && checkz && checky);
+    
+  }
 
+  applyForce(force, relativePosition , inPosition=new THREE.Vector4(0,0,0,Infinity)) {
+    let f ;
+    if(this.check_IN_theposition(inPosition)){
+      f = force.clone().divideScalar(this.mass);
+      this.acceleration.add(f);
+    }
+    
     if (relativePosition) {
       const torque = relativePosition.clone().cross(f);
       this.applyTorque(torque);
