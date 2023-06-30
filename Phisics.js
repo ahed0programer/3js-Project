@@ -8,8 +8,13 @@ class PhisicalOBJ {
     this.quaternion = new THREE.Quaternion(); // add quaternion property
     this.angularVelocity = new THREE.Vector3(); // add angular velocity property
     this.angularAcceleration = new THREE.Vector3(); // add angular acceleration property
+    this.horizon=0;
+    this.deriction=0;
+    this.angle_v_quaternion=0
   }
 
+  // checking the if the model is in the region of the force 
+  // note the you can pass 0 for any x,y,z to make the feild infinity on the passed axis
   check_IN_theposition(inPosition){
     let checkx=false;
     let checkz=false;
@@ -26,7 +31,7 @@ class PhisicalOBJ {
   }
 
   applyForce(force, relativePosition , inPosition=new THREE.Vector4(0,0,0,Infinity)) {
-    let f ;
+    var f ;
     if(this.check_IN_theposition(inPosition)){
       f = force.clone().divideScalar(this.mass);
       this.acceleration.add(f);
@@ -36,13 +41,56 @@ class PhisicalOBJ {
       const torque = relativePosition.clone().cross(f);
       this.applyTorque(torque);
     }
+
+    return f ? f.multiplyScalar(1/60):null;
   }
 
   applyTorque(torque) {
     this.angularAcceleration.add(torque.divideScalar(this.mass));
   }
 
+  calculate_horizon(){
+    // this method calculate the angle between world space's y axis and model's y axis
+
+    const toRotationTransM = new THREE.Matrix4();
+    toRotationTransM.makeRotationFromQuaternion(this.quaternion);
+
+    const modelY = new THREE.Vector3(0, 1, 0).applyMatrix4(toRotationTransM);
+
+    const worldY = new THREE.Vector3(0, 1, 0);
+    this.horizon = worldY.angleTo(modelY);
+  }
+
+  calculate_deriction(){
+    // this method calculate the angle between world space's X axis and model's X axis
+    const toRotationTransM = new THREE.Matrix4();
+    toRotationTransM.makeRotationFromQuaternion(this.quaternion);
+
+    const modelX = new THREE.Vector3(1, 0, 0).applyMatrix4(toRotationTransM);
+
+    const worldX = new THREE.Vector3(1, 0, 0);
+    //this.deriction = worldX.angleTo(modelX);
+    const crossProduct = worldX.clone().cross(modelX);
+    let sign = 1;
+    if (crossProduct.y < 0) {
+      sign = -1;
+    }
+  
+    this.deriction = sign * worldX.angleTo(modelX);
+  
+  }
+
+  calculate_teta(){
+    // this method calculate the angle between world space's y axis and model's y axis
+
+    const Velocity = new THREE.Vector3(this.velocity.x, 0, this.velocity.z);
+    this.angle_v_quaternion = this.deriction - Velocity.angleTo(new THREE.Vector3(1, 0, 0));
+  }
+
+
+
   update(dt) {
+   
     // Update velocity based on acceleration
     this.velocity.add(this.acceleration.clone().multiplyScalar(dt));
 
@@ -51,6 +99,8 @@ class PhisicalOBJ {
 
     // Clear acceleration for next frame
     this.acceleration.set(0, 0, 0);
+
+    this.velocity.clone().normalize();
 
     // Update angular velocity based on angular acceleration
     this.angularVelocity.add(this.angularAcceleration.clone().multiplyScalar(dt));
@@ -66,6 +116,10 @@ class PhisicalOBJ {
 
     // Clear angular acceleration for next frame
     this.angularAcceleration.set(0, 0, 0);
+
+    this.calculate_horizon();
+    this.calculate_deriction();
+    this.calculate_teta();
   }
 }
 

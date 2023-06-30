@@ -35,7 +35,7 @@
          }
          .DynamicElement {
            position: absolute;
-           top: 470px;
+           top: 69%;
            left: 10px;
          }
          .widthInput{
@@ -44,6 +44,7 @@
          li {
             margin-right: 20px; ;
          }
+         
       </style>
    </head>
 
@@ -184,7 +185,7 @@
       </div>
 
       <!--  Second Dynamic tables  -->
-     <div style="float: left;  position: absolute; top: 470px; left: 330px;">     
+     <div style="float: left;  position: absolute; top: 69%; left: 330px;">     
          <table class="table table-dark table-sm " style="width: 90%;">
             <thead>
                <tr>
@@ -218,7 +219,7 @@
      </div>
 
        <!--  Third Dynamic tables  -->
-       <div style="float: left;  position: absolute; top: 470px; left: 650px;">     
+       <div style="float: left;  position: absolute; top: 69%; left: 650px;">     
          <table class="table table-dark table-sm " style="width: 90%;">
             <thead>
                <tr>
@@ -251,13 +252,14 @@
          </table>
      </div>
 
-     <div style="position: absolute; top: 4%; left: 2%;">
-         <ul style="color: yellow;">
-            <li>Angular v : 2</li>
+     <!-- display data in the view port -->
+     <div style="position: absolute; top: 4%; left: 2%; ">
+         <ul style="color: yellow; list-style: none;">
+            <li id="angular_v">Angular v : 2</li>
             <li>x : 2 </li>
-            <li>Angular v : 2</li>
          </ul>
      </div>
+
      <div style="position: absolute; top: 4%; right: 30%;">
          <ul style="color: aqua; display: flex; flex-direction: row; list-style: none;">
             <li id="x">x : 2</li>
@@ -266,25 +268,25 @@
          </ul>
      </div>
 
+     <canvas id="derictionCanvas" width="100" height="120" style="position: absolute; top: 50%; left: 63%;">
+      </canvas> 
+     <!-- ................... -->
 
      <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script> 
      <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/OBJLoader.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/MTLLoader.js"></script>
-     <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/TDSLoader.js"></script> -->
 
       <div id="threejs-container"></div>
       
-      <script src="Phisics.js?v=10">
+      <script src="Phisics.js?v=39">
       </script>
 
-      <script src="scene env.js?v=31">
+      <script src="scene env.js?v=32">
       </script>
 
-      <script src="script.js?v=27">
+      <script src="script.js?v=136">
       </script>
 
    </body>
 </html>
-
-
