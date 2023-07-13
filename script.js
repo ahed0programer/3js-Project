@@ -58,6 +58,7 @@ const air_v = (air_vElement.value*1000)/3600;
 const gravity  = new THREE.Vector3(0,-mass*9.82,0);
 const engineForce   = new THREE.Vector3(1,0,0);
 const AirResistence = new THREE.Vector3(-1,0,0);
+const RR = new THREE.Vector3(-1,0,0);
 const AirResistenceZ = new THREE.Vector3(0,0,-1);
 const Y_AirResistence = new THREE.Vector3(0,1,0);
 const Z_AirResistence = new THREE.Vector3(0,0,1);
@@ -181,21 +182,39 @@ pauseElement.addEventListener('click',function(){
 })
 
 
+function transformVector(vector) {
+  // Calculate x
+  if((vector.x + vector.y + vector.z)>0)
+  var x = 1 / (vector.x + vector.y + vector.z);
+  else 
+  return new THREE.Vector3(0,0,0);
+
+  // Transform vector components
+  var y1 = vector.x * x;
+  var y2 = vector.y * x;
+  var y3 = vector.z * x;
+
+  // Create and return the transformed vector
+  var transformedVector = new THREE.Vector3(y1, y2, y3);
+  return transformedVector;
+}
+
 function applyChanges(){
   
   //let v  = phisicalbody.velocity.length();
   let vxz  = Math.sqrt(phisicalbody.velocity.x*phisicalbody.velocity.x + phisicalbody.velocity.z*phisicalbody.velocity.z);
   let vy = phisicalbody.velocity.y;
-  let vx = phisicalbody.velocity.x;
+  // let vx = phisicalbody.velocity.x;
   let vz = phisicalbody.velocity.z;
 
-  airResist =0.5*vx*vx*density*wings_area*Math.sin(M_W_angle)*CDn;
+  airResist =0.5*vxz*vxz*density*wings_area*Math.sin(M_W_angle)*CDn;
+  rr = -0.5*vxz*vxz*density*plane_bottom_area*Math.sin(phisicalbody.angle_v_quaternion)*CDn
   floatingF = airResist*Math.cos(M_W_angle);
-  Y_airResist = -Math.sign(vy)*0.5*vy*vy*density*(wings_area*Math.cos(M_W_angle)*Math.abs(Math.cos(phisicalbody.horizon))+plane_bottom_area);
-  Z_airResist = -Math.sign(vz)*0.5*vz*vz*density*(wings_area*Math.cos(M_W_angle)*Math.abs(Math.sin(phisicalbody.horizon))+plane_bottom_area);
+  Y_airResist = -Math.sign(vy)*0.5*vy*vy*density*(wings_area*Math.cos(M_W_angle)*Math.abs(Math.cos(phisicalbody.horizon))+plane_bottom_area)
+  Z_airResist = -Math.sign(vz)*0.5*v_fromforce*v_fromforce*density*(wings_area*Math.cos(M_W_angle)*Math.abs(Math.sin(phisicalbody.horizon))+plane_bottom_area);
 
-  airfoil = 0.2*(air_v-vy)*(air_v-vy)*density*(wings_area+plane_bottom_area)*(Math.random()*Math.sin(time));
-  time+=(1/240) 
+  airfoil = 0.2*(air_v-vy)*(air_v-vy)*density*(wings_area+plane_bottom_area)*(Math.random()*Math.sin(time)*Math.floor(time/2));
+  time+=(1/240)
   if(time>=Math.PI)
   time = 0;
 
@@ -203,32 +222,39 @@ function applyChanges(){
   // those are the wings that controls the plane path and two-side wings and rare wing
   // the rare wing is responsible about tha plane's rotation 
   // the two-side wings are responsible about moving the plane (left -right) without rotaion
-  LW_Resist   = 0.5*vx*vx*density*LR_W_area*Math.sin(L_wing_Angle);
-  RW_Resist   = 0.5*vx*vx*density*LR_W_area*Math.sin(R_wing_Angle);
-  Rare_Resist = 0.5*vx*vx*density*Rare_W_area*Math.sin(Rare_wing_Angle);
+  LW_Resist   = 0.5*vxz*vxz*density*LR_W_area*Math.sin(L_wing_Angle);
+  RW_Resist   = 0.5*vxz*vxz*density*LR_W_area*Math.sin(R_wing_Angle);
+  Rare_Resist = 0.5*vxz*vxz*density*Rare_W_area*Math.sin(Rare_wing_Angle);
+  
 
 
   // applying forces on the body after transforming them from world space to model's space( body's space)
   // ..........
   phisicalbody.applyForce(engineForce.clone().applyQuaternion(phisicalbody.quaternion).multiplyScalar(enginepower));
   phisicalbody.applyForce(AirResistence.clone().applyQuaternion(phisicalbody.quaternion).multiplyScalar(airResist) );
+  phisicalbody.applyForce(transformVector(phisicalbody.velocity.clone()).clone().applyQuaternion(phisicalbody.quaternion).multiplyScalar(rr),new THREE.Vector3(-Rare_W_Distance,0,0));
 
   V_of_floatnig = phisicalbody.applyForce(FloatingForce.clone().applyQuaternion(phisicalbody.quaternion).multiplyScalar(floatingF));
-  phisicalbody.applyForce(Y_AirResistence.clone().multiplyScalar(Y_airResist));
-  V_of_resist = phisicalbody.applyForce(Z_AirResistence.clone().multiplyScalar(Z_airResist));
+  V_of_resist   = phisicalbody.applyForce(Z_AirResistence.clone().multiplyScalar(Z_airResist));
   /////////////
-  Vzx=Math.sqrt(V_of_floatnig.x*V_of_floatnig.x + V_of_floatnig.z*V_of_floatnig.z);
-  v_fromforce += V_of_floatnig.z + V_of_resist.z;
-  console.log(v_fromforce + " A");
-  console.log(phisicalbody.velocity.z)
+  VzxF=Math.sqrt(V_of_floatnig.x*V_of_floatnig.x + V_of_floatnig.z*V_of_floatnig.z);
+  VzxR=Math.sqrt(V_of_resist.x*V_of_resist.x + V_of_resist.z*V_of_resist.z);
+  v_fromforce += VzxF - VzxR;
 
-  if(phisicalbody.position.y > 1){
-  phisicalbody.applyForce(new THREE.Vector3(0,RW_Resist,0),new THREE.Vector3(0,0,LR_Distance/2));
-  phisicalbody.applyForce(new THREE.Vector3(0,LW_Resist,0),new THREE.Vector3(0,0,-LR_Distance/2));
+  if(L_wing_Angle ==0 && R_wing_Angle == 0 && Rare_wing_Angle==0){
+     phisicalbody.angularVelocity.set(0,0,0);
   }
-  phisicalbody.applyForce(new THREE.Vector3(0,0,Rare_Resist),new THREE.Vector3(Rare_W_Distance,0,0));
+
+  
+  phisicalbody.applyForce(Y_AirResistence.clone().multiplyScalar(Y_airResist));
+  phisicalbody.applyForce(new THREE.Vector3(0,0,Rare_Resist).applyQuaternion(phisicalbody.quaternion),new THREE.Vector3(Rare_W_Distance,0,0).applyQuaternion(phisicalbody.quaternion));
   phisicalbody.applyForce(new THREE.Vector3(0,airfoil,0),undefined, new THREE.Vector4(Mountmodel.position.x+2000 ,Mountmodel.position.y , Mountmodel.position.z,500));
   
+  if(phisicalbody.position.y > 1){
+    phisicalbody.applyForce(new THREE.Vector3(0,1,0).multiplyScalar(RW_Resist),new THREE.Vector3(0,0,LR_Distance/2).applyQuaternion(phisicalbody.quaternion));
+    phisicalbody.applyForce(new THREE.Vector3(0,1,0).multiplyScalar(LW_Resist),new THREE.Vector3(0,0,-LR_Distance/2).applyQuaternion(phisicalbody.quaternion));
+    }
+
   phisicalbody.applyForce(Y_AirResistence.clone().multiplyScalar(Y_airResist));
 
   if(phisicalbody.position.y>0.2)
@@ -238,7 +264,7 @@ function applyChanges(){
   
   pressure   = P0*Math.exp(-g*M*Math.floor(phisicalbody.position.y)/(R*temp))
   pressure_D = P0 - ((airResist/((wings_area + body_area)*6894.757))+pressure);
-  density=6894.757*pressure*M/(R*temp);
+  density =6894.757*pressure*M/(R*temp);
   
   displayData()
 }
@@ -271,20 +297,20 @@ function draw_deriction() {
 
 function displayData(){
   draw_deriction(draw_deriction())
-  pressureElement.innerHTML =pressure;
-  densityElement.innerHTML =density
+  pressureElement.innerHTML =(pressure+" ").substring(0,8);
+  densityElement.innerHTML =(density+" ").substring(0,8)
   highElemnt.innerHTML =parseInt(phisicalbody.position.y);
   speedElement.innerHTML =Math.floor(0.5+(3600*phisicalbody.velocity.length()/1000));
   AirResistenceElemnt.innerHTML=parseInt(airResist);
   floating_forceElemnt.innerHTML=parseInt(floatingF);
-  P_horizonElement.innerHTML = (phisicalbody.horizon*180)/Math.PI;
+  P_horizonElement.innerHTML = Math.floor((phisicalbody.horizon*180)/Math.PI);
   rare_w_angleElemnt.innerHTML = (Rare_wing_Angle*180)/Math.PI;
   angular_vElement.innerHTML = "Angular v : "+phisicalbody.angularVelocity.x;
   if(floatingF>((mass*g)-100) && floatingF<((mass*g)+100)){
     floating_forceElemnt.style.backgroundColor = 'darkgreen';
   }
   if (floatingF>((mass*g)+100)){
-    floating_forceElemnt.style.backgroundColor = 'yellow';
+    floating_forceElemnt.style.backgroundColor = '#661504';
   }
   if(pressure_D >= 8 ){
     pressure_DElemnt.style.backgroundColor='red';
@@ -297,7 +323,7 @@ function displayData(){
     pressure_DElemnt.style.backgroundColor='red';
     hazard.play();
   }
-  pressure_DElemnt.innerHTML=pressure_D
+  pressure_DElemnt.innerHTML=(pressure_D+" ").substring(0,8)
 
   // data on the display port 
   xElement.innerHTML = "x :  "+phisicalbody.angle_v_quaternion+" "+ parseInt(phisicalbody.position.x)

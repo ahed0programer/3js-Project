@@ -84,7 +84,11 @@ class PhisicalOBJ {
     // this method calculate the angle between world space's y axis and model's y axis
 
     const Velocity = new THREE.Vector3(this.velocity.x, 0, this.velocity.z);
-    this.angle_v_quaternion = this.deriction - Velocity.angleTo(new THREE.Vector3(1, 0, 0));
+
+    var quaterniondirection = new THREE.Vector3(1,0,0);
+    quaterniondirection.applyQuaternion(this.quaternion);
+    var derict = new THREE.Vector3(quaterniondirection.x,0,quaterniondirection.z);
+    this.angle_v_quaternion = Velocity.angleTo(derict);
   }
 
 

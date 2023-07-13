@@ -2,7 +2,19 @@ const width = window.innerWidth
 const height = window.innerHeight
 // scene
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0x000000)
+
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+
+    const cubeTexture = cubeTextureLoader.load([
+      'skybox/right.png',
+      'skybox/left.png',
+      'skybox/top.png',
+      'skybox/bottom.png',
+      'skybox/front.png',
+      'skybox/back.png'
+    ]);
+
+    scene.background=cubeTexture
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
 scene.add(light);
@@ -20,6 +32,7 @@ light.shadow.camera.bottom = -50
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(width/1.4, height/1.47)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.setClearColor(0x000000)
 // renderer.shadowMapEnabled = true
 // renderer.shadowMapType = THREE.PCFSoftShadowMap
 
@@ -65,15 +78,16 @@ const normal_valume = 0.5;
 //
 
 //plane 
-const planegeometry = new THREE.PlaneGeometry( 10000, 2000 ,30,30);
-const planematerial = new THREE.MeshBasicMaterial( {color: 0x8f8f8f, side: THREE.DoubleSide , wireframe :true  } );
-const plane = new THREE.Mesh( planegeometry, planematerial );
-plane.rotation.x=0.5*3.14
-plane.recieveShadow = true
-scene.add( plane );
+// const planegeometry = new THREE.PlaneGeometry( 100000, 100000 );
+// const planematerial = new THREE.MeshBasicMaterial( {color: 0x2926f5, side: THREE.DoubleSide , } );
+// const plane = new THREE.Mesh( planegeometry, planematerial );
+// plane.rotation.x=0.5*3.14
+// plane.recieveShadow = true
+// scene.add( plane );
 
 // 
 const controls = new THREE.OrbitControls (camera, renderer.domElement );
+controls.maxPolarAngle = Math.PI / 2;
 //
 
 const OBJmodel = new THREE.Object3D();
@@ -143,6 +157,7 @@ mtl2Loader.load('road2/untitled.mtl', (materials) => {
 
       object.scale.x=150;
       object.scale.z=50;
+      object.scale.y=5;
       object.position.x=0;
       //object.rotation.x=-0.5*3.14
       //object.castShadow = true
