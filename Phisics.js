@@ -1,5 +1,6 @@
 
 class PhisicalOBJ {
+
   constructor(mass, position, velocity) {
     this.mass = mass;
     this.position = position || new THREE.Vector3();
@@ -30,6 +31,7 @@ class PhisicalOBJ {
     
   }
 
+  // appling forces to the object 
   applyForce(force, relativePosition , inPosition=new THREE.Vector4(0,0,0,Infinity)) {
     var f ;
     if(this.check_IN_theposition(inPosition)){
@@ -38,17 +40,19 @@ class PhisicalOBJ {
     }
     
     if (relativePosition) {
-      const torque = relativePosition.clone().cross(f);
+      const torque = relativePosition.clone().cross(force);
       this.applyTorque(torque);
     }
 
     return f ? f.multiplyScalar(1/60):null;
   }
 
+  // appling torques if the force is causing a torque
   applyTorque(torque) {
     this.angularAcceleration.add(torque.divideScalar(this.mass));
   }
 
+  // calculate the horizon (the angle between the plane's horizon and world's horizon  )
   calculate_horizon(){
     // this method calculate the angle between world space's y axis and model's y axis
 
@@ -61,6 +65,7 @@ class PhisicalOBJ {
     this.horizon = worldY.angleTo(modelY);
   }
 
+  // calculate the deriction of the world with respect to the world 
   calculate_deriction(){
     // this method calculate the angle between world space's X axis and model's X axis
     const toRotationTransM = new THREE.Matrix4();
@@ -80,19 +85,20 @@ class PhisicalOBJ {
   
   }
 
+  // calculate the angle between plane's velocity and its deriction 
+  // this helps to calculates the air resistance on the plane 
   calculate_teta(){
-    // this method calculate the angle between world space's y axis and model's y axis
+    // this method calculates the angle between velocity vector and model's direction (quaternion)
 
     const Velocity = new THREE.Vector3(this.velocity.x, 0, this.velocity.z);
 
     var quaterniondirection = new THREE.Vector3(1,0,0);
     quaterniondirection.applyQuaternion(this.quaternion);
-    var derict = new THREE.Vector3(quaterniondirection.x,0,quaterniondirection.z);
-    this.angle_v_quaternion = Velocity.angleTo(derict);
+    var direct = new THREE.Vector3(quaterniondirection.x,0,quaterniondirection.z);
+    this.angle_v_quaternion = Velocity.angleTo(direct);
   }
 
-
-
+  // updates the object's data (plane)
   update(dt) {
    
     // Update velocity based on acceleration
@@ -126,39 +132,3 @@ class PhisicalOBJ {
     this.calculate_teta();
   }
 }
-
-
-
-// class PhisicalOBJ {
- 
-
-//   constructor(mass, postion) {
-//     this.mass = mass;
-//     this.postion=postion;
-//     this.velocity = new velocity(0,0,0);
-//   }
-
-//   applyForce(Vec3) {
-        
-//   }
-
-//   method2() {
-//     // Method code here
-//   }
-// }
-
-// class position{
-//     constructor(x,y,z){
-//         this.x=x;
-//         this.y=y;
-//         this.z=z;
-//     }
-// }
-
-// class velocity{
-//     constructor(x,y,z){
-//         this.x=x;
-//         this.y=y;
-//         this.z=z;
-//     }
-// }
