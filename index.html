@@ -137,10 +137,8 @@
             <div class="card">
             <div class="card-body">
                <button id="start" type="button" class="btn btn-success">start</button>
-               <button id="reset" type="button" class="btn btn-primary">top</button>
+               <button id="reset" onclick="refresh()" type="button" class="btn btn-primary">reset</button>
                <button id="pause" type="button" class="btn btn-warning">pause</button>
-               <button id="reset" type="button" class="btn btn-danger">reset</button>
-
             </div>
             </div>
          </div>
@@ -279,14 +277,19 @@
 
       <div id="threejs-container"></div>
       
-      <script src="Phisics.js?v=49">
+      <script src="Phisics.js?v=56">
       </script>
 
       <script src="scene env.js?v=70">
       </script>
 
-      <script src="script.js?v=209">
+      <script src="script.js?v=223">
       </script>
 
+      <script>
+         function refresh(){
+            location.reload();
+         }
+      </script>
    </body>
 </html>

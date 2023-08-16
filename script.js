@@ -41,16 +41,17 @@ const densityElement =  document.getElementById("density");
 // here they are the parameters coming from the static factors
 // ...............
 const g=9.81 ;const R=8.31447 ; const M =0.0289644 ;
-const temp=TemparetureElemnt.value ; const P0 = 14.6959*R_pressureElemnt.value ;
-const wings_area =2*M_W_areaElemnt.value; const body_area=body_AreaElemnt.value;
-const LR_W_area=LR_W_areaAElemnt.value; const LR_Distance= LR_DistanceAElemnt.value;
-const mass = massElement.value;
-const CDn = CDnElement.value;
-const M_W_angle = (M_W_angleElement.value * Math.PI)/180;
-const plane_bottom_area =plane_bottom_areaElemnt.value;
-const Rare_W_area = Rare_W_areaElemnt.value;
-const Rare_W_Distance = Rare_W_DistanceElemnt.value;
-const air_v = (air_vElement.value*1000)/3600;
+
+var temp=TemparetureElemnt.value ; var P0 = 14.6959*R_pressureElemnt.value ;
+var wings_area =2*M_W_areaElemnt.value; var body_area=body_AreaElemnt.value;
+var LR_W_area=LR_W_areaAElemnt.value; var LR_Distance= LR_DistanceAElemnt.value;
+var mass = massElement.value;
+var CDn = CDnElement.value;
+var M_W_angle = (M_W_angleElement.value * Math.PI)/180;
+var plane_bottom_area =plane_bottom_areaElemnt.value;
+var Rare_W_area = Rare_W_areaElemnt.value;
+var Rare_W_Distance = Rare_W_DistanceElemnt.value;
+var air_v = (air_vElement.value*1000)/3600;
 
 // here they are the forces victors used in Ahed's phisics class 
 // those are used to apply forces on the phisics object body (from civil plane's expeirance)
@@ -75,7 +76,7 @@ var v_fromforce=0
 //  var modelrotation=0;
 
 
-const phisicalbody = new PhisicalOBJ(mass , new THREE.Vector3(-2000,0,0) )
+var phisicalbody = new PhisicalOBJ(mass , new THREE.Vector3(-2000,0,0) )
 //phisicalbody.quaternion = OBJmodel.quaternion;
 let rotationSpeed = Math.PI/80;
 // Add event listener for keydown events
@@ -162,11 +163,24 @@ const pauseElement = document.getElementById("pause");
 
 let status = false;
 startElement.addEventListener('click',function(){
+
+  temp=TemparetureElemnt.value ;  P0 = 14.6959*R_pressureElemnt.value ;
+  wings_area =2*M_W_areaElemnt.value;  body_area=body_AreaElemnt.value;
+  LR_W_area=LR_W_areaAElemnt.value;  LR_Distance= LR_DistanceAElemnt.value;
+  mass = massElement.value;
+  CDn = CDnElement.value;
+  M_W_angle = (M_W_angleElement.value * Math.PI)/180;
+  plane_bottom_area =plane_bottom_areaElemnt.value;
+  Rare_W_area = Rare_W_areaElemnt.value;
+  Rare_W_Distance = Rare_W_DistanceElemnt.value;
+  air_v = (air_vElement.value*1000)/3600;
+
+  phisicalbody.mass = mass;
+ 
   status=true
   sound.play();
   warning.play();
   warning.pause();
-  //audioContext.resume()
 
   animate()
 })
@@ -180,24 +194,30 @@ pauseElement.addEventListener('click',function(){
 
 
 function transformVector(vector) {
+  let x=1,y=1,z=1;
+  if(vector.x<0) x=-1;
+  if(vector.y<0) y=-1;
+  if(vector.z<0) z=-1;
+
+  let absX = (x*vector.x) , absY = (y*vector.y) , absZ = (z*vector.z);
   // Calculate x
-  if((vector.x + vector.y + vector.z)>0)
-  var x = 1 / (vector.x + vector.y + vector.z);
+  if((absX + absY + absZ)!=0)
+    var A = 1 / (absX + absY + absZ);
   else 
-  return new THREE.Vector3(0,0,0);
+    return new THREE.Vector3(0,0,0);
 
   // Transform vector components
-  var y1 = vector.x * x;
-  var y2 = vector.y * x;
-  var y3 = vector.z * x;
+  var x1 = vector.x * A;
+  var y1 = vector.y * A;
+  var z1 = vector.z * A;
 
   // Create and return the transformed vector
-  var transformedVector = new THREE.Vector3(y1, y2, y3);
+  var transformedVector = new THREE.Vector3(x1, y1, z1);
   return transformedVector;
 }
 
 function applyChanges(){
-  
+  console.log(phisicalbody.mass);
   //let v  = phisicalbody.velocity.length();
   let vxz  = Math.sqrt(phisicalbody.velocity.x*phisicalbody.velocity.x + phisicalbody.velocity.z*phisicalbody.velocity.z);
   let vy = phisicalbody.velocity.y;
@@ -254,21 +274,21 @@ function applyChanges(){
 
   phisicalbody.applyForce(Y_AirResistence.clone().multiplyScalar(Y_airResist));
 
-  if(phisicalbody.position.y>0.2)
-    phisicalbody.applyForce(gravity);
-  else{
-    if(phisicalbody.velocity.y<2)
-    phisicalbody.velocity.y=0
-    else
-    phisicalbody.velocity.y=-phisicalbody.velocity.y/1.4
+    if(phisicalbody.position.y>0.2)
+      phisicalbody.applyForce(gravity);
+    else{
+      if(phisicalbody.velocity.y<2)
+      phisicalbody.velocity.y=0
+      else
+      phisicalbody.velocity.y=-phisicalbody.velocity.y/1.4
+    }
+  
+    pressure   = P0*Math.exp(-g*M*Math.floor(phisicalbody.position.y)/(R*temp))
+    pressure_D = P0 - ((airResist/((wings_area + body_area)*6894.757))+pressure);
+    density =6894.757*pressure*M/(R*temp);
+    
+    displayData()
   }
-  
-  pressure   = P0*Math.exp(-g*M*Math.floor(phisicalbody.position.y)/(R*temp))
-  pressure_D = P0 - ((airResist/((wings_area + body_area)*6894.757))+pressure);
-  density =6894.757*pressure*M/(R*temp);
-  
-  displayData()
-}
 
 var canv = document.getElementById("derictionCanvas");
 var ctx = canv.getContext("2d");

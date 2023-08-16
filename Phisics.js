@@ -14,6 +14,10 @@ class PhisicalOBJ {
     this.angle_v_quaternion=0
   }
 
+  set(mass){
+    this.mass=mass
+  }
+
   // checking the if the model is in the region of the force 
   // note the you can pass 0 for any x,y,z to make the feild infinity on the passed axis
   check_IN_theposition(inPosition){
@@ -41,15 +45,13 @@ class PhisicalOBJ {
     
     if (relativePosition) {
       const torque = relativePosition.clone().cross(force);
-      this.applyTorque(torque);
+      this.applyTorque(torque,relativePosition.length());
     }
-
-    return f ? f.multiplyScalar(1/60):null;
   }
 
   // appling torques if the force is causing a torque
-  applyTorque(torque) {
-    this.angularAcceleration.add(torque.divideScalar(this.mass));
+  applyTorque(torque,r) {
+    this.angularAcceleration.add(torque.divideScalar(0.5*this.mass*r*r));
   }
 
   // calculate the horizon (the angle between the plane's horizon and world's horizon  )
